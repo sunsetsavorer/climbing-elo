@@ -2,7 +2,10 @@ package domain
 
 import "time"
 
-const startingRating = 1000
+const (
+	startingRating = 1000
+	minRating      = 600
+)
 
 func NewClimber(
 	id string,
@@ -41,15 +44,20 @@ func (c *Climber) RecordAscent(grade Grade, outcome Outcome, now time.Time) (*As
 	delta := CalcDelta(c.Rating, gradeRating, c.AscentsCount, outcome)
 
 	ascent := &Ascent{
-		ClimberID:   c.ID,
-		Grade:       grade,
-		Outcome:     outcome,
-		Delta:       delta,
-		RatingAfter: c.Rating + delta,
-		CreatedAt:   now,
+		ClimberID: c.ID,
+		Grade:     grade,
+		Outcome:   outcome,
+		Delta:     delta,
+		CreatedAt: now,
 	}
 
-	c.Rating += delta
+	newRating := c.Rating + delta
+	if newRating < minRating {
+		newRating = minRating
+	}
+
+	ascent.RatingAfter = newRating
+	c.Rating = newRating
 	c.AscentsCount++
 
 	if outcome == OutcomeFlash {

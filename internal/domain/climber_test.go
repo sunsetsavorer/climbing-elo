@@ -81,6 +81,21 @@ func TestRecordAscentBestFlashUpdatedOnHarderGrade(t *testing.T) {
 	}
 }
 
+func TestRecordAscentRatingFloor(t *testing.T) {
+	c := &Climber{ID: "test-id", Rating: minRating + 1}
+
+	ascent, err := c.RecordAscent(Grade5C, OutcomeFail, now)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if c.Rating != minRating {
+		t.Errorf("rating = %d, want %d (clamped to floor)", c.Rating, minRating)
+	}
+	if ascent.RatingAfter != minRating {
+		t.Errorf("ascent.RatingAfter = %d, want %d", ascent.RatingAfter, minRating)
+	}
+}
+
 func TestRecordAscentBestFlashNotDowngraded(t *testing.T) {
 	c := newClimber()
 
