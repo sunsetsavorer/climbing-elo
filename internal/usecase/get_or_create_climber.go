@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 
 	"github.com/sunsetsavorer/climbing-elo/internal/domain"
 )
@@ -45,7 +46,7 @@ type GetOrCreateClimberOutput struct {
 
 func (uc *GetOrCreateClimber) Exec(ctx context.Context, in GetOrCreateClimberInput) (*GetOrCreateClimberOutput, error) {
 	existing, err := uc.climberRepository.GetByTelegramID(ctx, in.TelegramID)
-	if err != nil {
+	if err != nil && !errors.Is(err, domain.ErrClimberNotFound) {
 		return nil, err
 	}
 	if existing != nil {

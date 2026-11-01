@@ -61,9 +61,6 @@ func (uc *RecordAscent) Exec(ctx context.Context, in RecordAscentInput) (*Record
 	if err != nil {
 		return nil, err
 	}
-	if climber == nil {
-		return nil, domain.ErrClimberNotFound
-	}
 
 	ascent, err := climber.RecordAscent(in.Grade, in.Outcome, uc.clock.Now())
 	if err != nil {
