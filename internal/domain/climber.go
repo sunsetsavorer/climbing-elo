@@ -28,7 +28,7 @@ type Climber struct {
 	Nickname     string
 	Rating       int
 	AscentsCount int
-	BestFlash    *Grade
+	HardestGrade    *Grade
 	CreatedAt    time.Time
 }
 
@@ -61,15 +61,15 @@ func (c *Climber) RecordAscent(grade Grade, outcome Outcome, now time.Time) (*As
 	c.AscentsCount++
 
 	if outcome == OutcomeFlash {
-		c.updateBestFlash(grade, gradeRating)
+		c.updateHardestGrade(grade, gradeRating)
 	}
 
 	return ascent, nil
 }
 
-func (c *Climber) updateBestFlash(grade Grade, gradeRating int) {
-	if c.BestFlash == nil || gradeRating > mustRating(*c.BestFlash) {
-		c.BestFlash = &grade
+func (c *Climber) updateHardestGrade(grade Grade, gradeRating int) {
+	if c.HardestGrade == nil || gradeRating > mustRating(*c.HardestGrade) {
+		c.HardestGrade = &grade
 	}
 }
 

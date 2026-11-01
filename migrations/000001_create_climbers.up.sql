@@ -4,6 +4,6 @@ CREATE TABLE climbers (
     nickname     TEXT        NOT NULL,
     rating       INTEGER     NOT NULL DEFAULT 1000,
     ascents_count INTEGER    NOT NULL DEFAULT 0,
-    best_flash   TEXT,
+    hardest_grade   TEXT,
     created_at   TIMESTAMPTZ NOT NULL
 );

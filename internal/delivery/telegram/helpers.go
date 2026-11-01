@@ -45,15 +45,15 @@ func formatStatResponse(out *usecase.GetOrCreateClimberOutput) string {
 }
 
 func formatProfile(climber *domain.Climber) string {
-	bestFlash := "—"
-	if climber.BestFlash != nil {
-		bestFlash = string(*climber.BestFlash)
+	hardestGrade := "—"
+	if climber.HardestGrade != nil {
+		hardestGrade = string(*climber.HardestGrade)
 	}
 	return fmt.Sprintf(
 		"Рейтинг:       %d\nПролазов:      %d\nЛучший флеш:   %s",
 		climber.Rating,
 		climber.AscentsCount,
-		bestFlash,
+		hardestGrade,
 	)
 }
 
