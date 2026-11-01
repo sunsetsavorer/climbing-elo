@@ -75,7 +75,7 @@ func (uc *RecordAscent) Exec(ctx context.Context, in RecordAscentInput) (*Record
 		if err := uc.ascentRepository.Save(ctx, ascent); err != nil {
 			return err
 		}
-		return uc.climberRepository.Update(ctx, climber)
+		return uc.climberRepository.Save(ctx, climber)
 	}); err != nil {
 		return nil, err
 	}
