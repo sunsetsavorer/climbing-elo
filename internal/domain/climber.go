@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-const StartingRating = 1000
+const startingRating = 1000
 
 type Climber struct {
 	ID           string
