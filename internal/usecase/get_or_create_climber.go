@@ -16,12 +16,21 @@ func NewGetOrCreateClimber(
 	idGenerator IDGenerator,
 	clock Clock,
 	climberRepository ClimberRepository,
-) *GetOrCreateClimber {
+) (*GetOrCreateClimber, error) {
+	if idGenerator == nil {
+		return nil, ErrIDGeneratorRequired
+	}
+	if clock == nil {
+		return nil, ErrClockRequired
+	}
+	if climberRepository == nil {
+		return nil, ErrClimberRepositoryRequired
+	}
 	return &GetOrCreateClimber{
 		idGenerator:       idGenerator,
 		clock:             clock,
 		climberRepository: climberRepository,
-	}
+	}, nil
 }
 
 type GetOrCreateClimberInput struct {

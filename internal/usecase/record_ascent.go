@@ -20,14 +20,29 @@ func NewRecordAscent(
 	climberRepository ClimberRepository,
 	ascentRepository AscentRepository,
 	txManager TxManager,
-) *RecordAscent {
+) (*RecordAscent, error) {
+	if idGenerator == nil {
+		return nil, ErrIDGeneratorRequired
+	}
+	if clock == nil {
+		return nil, ErrClockRequired
+	}
+	if climberRepository == nil {
+		return nil, ErrClimberRepositoryRequired
+	}
+	if ascentRepository == nil {
+		return nil, ErrAscentRepositoryRequired
+	}
+	if txManager == nil {
+		return nil, ErrTxManagerRequired
+	}
 	return &RecordAscent{
 		idGenerator:       idGenerator,
 		clock:             clock,
 		climberRepository: climberRepository,
 		ascentRepository:  ascentRepository,
 		txManager:         txManager,
-	}
+	}, nil
 }
 
 type RecordAscentInput struct {
