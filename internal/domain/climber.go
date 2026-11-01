@@ -4,6 +4,21 @@ import "time"
 
 const startingRating = 1000
 
+func NewClimber(
+	id string,
+	telegramID int64,
+	nickname string,
+	now time.Time,
+) *Climber {
+	return &Climber{
+		ID:         id,
+		TelegramID: telegramID,
+		Nickname:   nickname,
+		Rating:     startingRating,
+		CreatedAt:  now,
+	}
+}
+
 type Climber struct {
 	ID           string
 	TelegramID   int64
