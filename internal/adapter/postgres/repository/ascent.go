@@ -16,5 +16,5 @@ func NewAscentRepository(db *gorm.DB) *AscentRepository {
 }
 
 func (r *AscentRepository) Save(ctx context.Context, ascent *domain.Ascent) error {
-	return r.db.WithContext(ctx).Save(toAscentModel(ascent)).Error
+	return conn(ctx, r.db).Save(toAscentModel(ascent)).Error
 }

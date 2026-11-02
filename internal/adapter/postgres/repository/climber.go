@@ -17,13 +17,13 @@ func NewClimberRepository(db *gorm.DB) *ClimberRepository {
 }
 
 func (r *ClimberRepository) Save(ctx context.Context, climber *domain.Climber) error {
-	return r.db.WithContext(ctx).Save(toClimberModel(climber)).Error
+	return conn(ctx, r.db).Save(toClimberModel(climber)).Error
 }
 
 func (r *ClimberRepository) GetByTelegramID(ctx context.Context, telegramID int64) (*domain.Climber, error) {
 	var m models.Climber
 
-	err := r.db.WithContext(ctx).
+	err := conn(ctx, r.db).
 		Where("telegram_id = ?", telegramID).
 		First(&m).
 		Error
