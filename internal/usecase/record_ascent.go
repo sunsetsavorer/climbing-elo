@@ -6,54 +6,58 @@ import (
 	"github.com/sunsetsavorer/climbing-elo/internal/domain"
 )
 
-type RecordAscent struct {
-	idGenerator       IDGenerator
-	clock             Clock
-	climberRepository ClimberRepository
-	ascentRepository  AscentRepository
-	txManager         TxManager
-}
+type (
+	RecordAscent struct {
+		idGenerator       IDGenerator
+		clock             Clock
+		climberRepository ClimberRepository
+		ascentRepository  AscentRepository
+		txManager         TxManager
+	}
 
-func NewRecordAscent(
-	idGenerator IDGenerator,
-	clock Clock,
-	climberRepository ClimberRepository,
-	ascentRepository AscentRepository,
-	txManager TxManager,
-) (*RecordAscent, error) {
-	if idGenerator == nil {
+	RecordAscentDeps struct {
+		IDGenerator       IDGenerator
+		Clock             Clock
+		ClimberRepository ClimberRepository
+		AscentRepository  AscentRepository
+		TxManager         TxManager
+	}
+
+	RecordAscentInput struct {
+		TelegramID int64
+		Grade      domain.Grade
+		Outcome    domain.Outcome
+	}
+
+	RecordAscentOutput struct {
+		Ascent  *domain.Ascent
+		Climber *domain.Climber
+	}
+)
+
+func NewRecordAscent(deps RecordAscentDeps) (*RecordAscent, error) {
+	if deps.IDGenerator == nil {
 		return nil, ErrIDGeneratorRequired
 	}
-	if clock == nil {
+	if deps.Clock == nil {
 		return nil, ErrClockRequired
 	}
-	if climberRepository == nil {
+	if deps.ClimberRepository == nil {
 		return nil, ErrClimberRepositoryRequired
 	}
-	if ascentRepository == nil {
+	if deps.AscentRepository == nil {
 		return nil, ErrAscentRepositoryRequired
 	}
-	if txManager == nil {
+	if deps.TxManager == nil {
 		return nil, ErrTxManagerRequired
 	}
 	return &RecordAscent{
-		idGenerator:       idGenerator,
-		clock:             clock,
-		climberRepository: climberRepository,
-		ascentRepository:  ascentRepository,
-		txManager:         txManager,
+		idGenerator:       deps.IDGenerator,
+		clock:             deps.Clock,
+		climberRepository: deps.ClimberRepository,
+		ascentRepository:  deps.AscentRepository,
+		txManager:         deps.TxManager,
 	}, nil
-}
-
-type RecordAscentInput struct {
-	TelegramID int64
-	Grade      domain.Grade
-	Outcome    domain.Outcome
-}
-
-type RecordAscentOutput struct {
-	Ascent  *domain.Ascent
-	Climber *domain.Climber
 }
 
 func (uc *RecordAscent) Exec(ctx context.Context, in RecordAscentInput) (*RecordAscentOutput, error) {

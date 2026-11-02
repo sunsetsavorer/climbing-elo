@@ -7,41 +7,45 @@ import (
 	"github.com/sunsetsavorer/climbing-elo/internal/domain"
 )
 
-type GetOrCreateClimber struct {
-	idGenerator       IDGenerator
-	clock             Clock
-	climberRepository ClimberRepository
-}
+type (
+	GetOrCreateClimber struct {
+		idGenerator       IDGenerator
+		clock             Clock
+		climberRepository ClimberRepository
+	}
 
-func NewGetOrCreateClimber(
-	idGenerator IDGenerator,
-	clock Clock,
-	climberRepository ClimberRepository,
-) (*GetOrCreateClimber, error) {
-	if idGenerator == nil {
+	GetOrCreateClimberDeps struct {
+		IDGenerator       IDGenerator
+		Clock             Clock
+		ClimberRepository ClimberRepository
+	}
+
+	GetOrCreateClimberInput struct {
+		Nickname   string
+		TelegramID int64
+	}
+
+	GetOrCreateClimberOutput struct {
+		Climber *domain.Climber
+		Created bool
+	}
+)
+
+func NewGetOrCreateClimber(deps GetOrCreateClimberDeps) (*GetOrCreateClimber, error) {
+	if deps.IDGenerator == nil {
 		return nil, ErrIDGeneratorRequired
 	}
-	if clock == nil {
+	if deps.Clock == nil {
 		return nil, ErrClockRequired
 	}
-	if climberRepository == nil {
+	if deps.ClimberRepository == nil {
 		return nil, ErrClimberRepositoryRequired
 	}
 	return &GetOrCreateClimber{
-		idGenerator:       idGenerator,
-		clock:             clock,
-		climberRepository: climberRepository,
+		idGenerator:       deps.IDGenerator,
+		clock:             deps.Clock,
+		climberRepository: deps.ClimberRepository,
 	}, nil
-}
-
-type GetOrCreateClimberInput struct {
-	Nickname   string
-	TelegramID int64
-}
-
-type GetOrCreateClimberOutput struct {
-	Climber *domain.Climber
-	Created bool
 }
 
 func (uc *GetOrCreateClimber) Exec(ctx context.Context, in GetOrCreateClimberInput) (*GetOrCreateClimberOutput, error) {
