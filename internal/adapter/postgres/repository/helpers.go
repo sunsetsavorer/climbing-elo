@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/sunsetsavorer/climbing-elo/internal/adapter/postgre/models"
+	"github.com/sunsetsavorer/climbing-elo/internal/adapter/postgres/models"
 	"github.com/sunsetsavorer/climbing-elo/internal/domain"
 )
 
