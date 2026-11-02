@@ -24,7 +24,7 @@ type Bot struct {
 }
 
 func NewBot(cfg *config.Config) (*Bot, error) {
-	db, err := postgres.NewDB(cfg.Database.DSN)
+	db, err := postgres.NewDB(cfg.Database.DSN())
 	if err != nil {
 		return nil, fmt.Errorf("connect to database: %w", err)
 	}

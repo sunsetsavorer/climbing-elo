@@ -1,0 +1,53 @@
+name: climbing-elo
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    env_file: configs/.env.docker
+    # The postgres image expects POSTGRES_* variables, map them from DB_*.
+    entrypoint:
+      - sh
+      - -c
+      - |
+        export POSTGRES_USER="$$DB_USER" POSTGRES_PASSWORD="$$DB_PASS" POSTGRES_DB="$$DB_NAME"
+        exec docker-entrypoint.sh postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$$DB_USER" -d "$$DB_NAME"']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: migrate/migrate:v4.20.1
+    env_file: configs/.env.docker
+    volumes:
+      - ./migrations:/migrations:ro
+    entrypoint:
+      - sh
+      - -c
+      - |
+        exec migrate -path=/migrations \
+          -database "$$DB_DRIVER://$$DB_USER:$$DB_PASS@$$DB_HOST:$$DB_PORT/$$DB_NAME?sslmode=disable" \
+          up
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  bot:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile
+    restart: unless-stopped
+    env_file: configs/.env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-data:
