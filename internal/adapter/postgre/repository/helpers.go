@@ -1,8 +1,8 @@
 package repository
 
 import (
+	"github.com/sunsetsavorer/climbing-elo/internal/adapter/postgre/models"
 	"github.com/sunsetsavorer/climbing-elo/internal/domain"
-	"github.com/sunsetsavorer/climbing-elo/internal/infrastructure/postgre/models"
 )
 
 func toClimberModel(c *domain.Climber) *models.Climber {
