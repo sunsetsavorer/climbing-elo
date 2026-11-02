@@ -44,3 +44,7 @@ func (s *Server) registerHandlers() {
 func (s *Server) Start() {
 	s.bot.Start()
 }
+
+func (s *Server) Stop() {
+	s.bot.Stop()
+}

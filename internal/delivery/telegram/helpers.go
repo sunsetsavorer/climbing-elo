@@ -50,7 +50,7 @@ func formatProfile(climber *domain.Climber) string {
 		hardestGrade = string(*climber.HardestGrade)
 	}
 	return fmt.Sprintf(
-		"Рейтинг:       %d\nПролазов:      %d\nЛучший флеш:   %s",
+		"Рейтинг:       %d\nПролазов:      %d\nСложнейший грейд:   %s",
 		climber.Rating,
 		climber.AscentsCount,
 		hardestGrade,
