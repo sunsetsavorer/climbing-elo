@@ -74,13 +74,47 @@ func formatHelpResponse() string {
 	return b.String()
 }
 
+var leaderboardMedals = []string{"🥇", "🥈", "🥉"}
+
+// formatLeaderboardResponse highlights the row of the climber with telegramID.
+func formatLeaderboardResponse(out *usecase.GetLeaderboardOutput, telegramID int64) string {
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("🏆 <b>Лидерборд</b>\n\nПервые %d по рейтингу:\n\n", leaderboardSize))
+
+	if len(out.Climbers) == 0 {
+		b.WriteString("Пока никого нет. Запиши первый пролаз!")
+		return b.String()
+	}
+
+	for i, climber := range out.Climbers {
+		place := fmt.Sprintf("%d.", i+1)
+		if i < len(leaderboardMedals) {
+			place = leaderboardMedals[i]
+		}
+
+		row := fmt.Sprintf("%s %s — %d", place, formatNickname(climber), climber.Rating)
+		if climber.TelegramID == telegramID {
+			row = "<b>" + row + "</b>"
+		}
+		b.WriteString(row + "\n")
+	}
+	return b.String()
+}
+
+func formatNickname(climber *domain.Climber) string {
+	if climber.Nickname == "" {
+		return "без ника"
+	}
+	return "@" + html.EscapeString(climber.Nickname)
+}
+
 func formatProfile(climber *domain.Climber) string {
 	hardestGrade := "—"
 	if climber.HardestGrade != nil {
 		hardestGrade = string(*climber.HardestGrade)
 	}
 	return fmt.Sprintf(
-		"🏆 Рейтинг: <b>%d</b>\n🧗 Пролазов: <b>%d</b>\n💪 Сложнейший грейд: <b>%s</b>",
+		"⭐ Рейтинг: <b>%d</b>\n🧗 Пролазов: <b>%d</b>\n💪 Сложнейший грейд: <b>%s</b>",
 		climber.Rating,
 		climber.AscentsCount,
 		hardestGrade,

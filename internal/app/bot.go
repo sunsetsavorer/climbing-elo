@@ -77,6 +77,13 @@ func newServer(cfg *config.Config, db *gorm.DB) (*telegram.Server, error) {
 		return nil, fmt.Errorf("init record ascent use case: %w", err)
 	}
 
+	getLeaderboard, err := usecase.NewGetLeaderboard(usecase.GetLeaderboardDeps{
+		ClimberRepository: climberRepository,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("init get leaderboard use case: %w", err)
+	}
+
 	bot, err := tele.NewBot(tele.Settings{
 		Token:  cfg.Bot.Token,
 		Poller: &tele.LongPoller{Timeout: pollerTimeout},
@@ -85,7 +92,7 @@ func newServer(cfg *config.Config, db *gorm.DB) (*telegram.Server, error) {
 		return nil, fmt.Errorf("init telegram bot: %w", err)
 	}
 
-	server, err := telegram.NewServer(bot, getOrCreateClimber, recordAscent)
+	server, err := telegram.NewServer(bot, getOrCreateClimber, recordAscent, getLeaderboard)
 	if err != nil {
 		return nil, fmt.Errorf("init telegram server: %w", err)
 	}

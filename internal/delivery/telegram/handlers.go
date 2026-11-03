@@ -9,6 +9,8 @@ import (
 	tele "gopkg.in/telebot.v3"
 )
 
+const leaderboardSize = 10
+
 func (s *Server) handleStart(c tele.Context) error {
 	out, err := s.getOrCreateClimber.Exec(context.Background(), usecase.GetOrCreateClimberInput{
 		TelegramID: c.Sender().ID,
@@ -71,6 +73,17 @@ func (s *Server) saveAscent(c tele.Context, outcome domain.Outcome, grade domain
 	}
 
 	return s.reply(c, formatAscentResponse(out), mainMenu())
+}
+
+func (s *Server) handleLeaderboard(c tele.Context) error {
+	out, err := s.getLeaderboard.Exec(context.Background(), usecase.GetLeaderboardInput{
+		Limit: leaderboardSize,
+	})
+	if err != nil {
+		return s.reply(c, formatError(err), mainMenu())
+	}
+
+	return s.reply(c, formatLeaderboardResponse(out, c.Sender().ID), mainMenu())
 }
 
 func (s *Server) handleHelp(c tele.Context) error {

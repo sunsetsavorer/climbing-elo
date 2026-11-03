@@ -11,6 +11,7 @@ type Server struct {
 	bot                *tele.Bot
 	getOrCreateClimber GetOrCreateClimberUseCase
 	recordAscent       RecordAscentUseCase
+	getLeaderboard     GetLeaderboardUseCase
 	lastReplies        sync.Map // chat ID -> tele.StoredMessage
 }
 
@@ -18,6 +19,7 @@ func NewServer(
 	bot *tele.Bot,
 	getOrCreateClimber GetOrCreateClimberUseCase,
 	recordAscent RecordAscentUseCase,
+	getLeaderboard GetLeaderboardUseCase,
 ) (*Server, error) {
 	if bot == nil {
 		return nil, ErrBotRequired
@@ -28,10 +30,14 @@ func NewServer(
 	if recordAscent == nil {
 		return nil, ErrRecordAscentRequired
 	}
+	if getLeaderboard == nil {
+		return nil, ErrGetLeaderboardRequired
+	}
 	s := &Server{
 		bot:                bot,
 		getOrCreateClimber: getOrCreateClimber,
 		recordAscent:       recordAscent,
+		getLeaderboard:     getLeaderboard,
 	}
 	s.registerHandlers()
 	if err := s.bot.SetCommands(botCommands()); err != nil {
@@ -52,6 +58,7 @@ var commands = []command{
 	{name: "flash", args: "категория", description: "Флеш"},
 	{name: "fail", args: "категория", description: "Не пролез"},
 	{name: "stat", description: "Твой рейтинг"},
+	{name: "leaderboard", description: "Лидерборд по рейтингу"},
 	{name: "help", description: "Список команд"},
 }
 
@@ -69,10 +76,12 @@ func (s *Server) registerHandlers() {
 	s.bot.Handle("/flash", s.handleFlash)
 	s.bot.Handle("/fail", s.handleFail)
 	s.bot.Handle("/stat", s.handleStart)
+	s.bot.Handle("/leaderboard", s.handleLeaderboard)
 
 	s.bot.Handle(&btnFlash, s.handleFlash)
 	s.bot.Handle(&btnFail, s.handleFail)
 	s.bot.Handle(&btnStat, s.handleStart)
+	s.bot.Handle(&btnLeaderboard, s.handleLeaderboard)
 	s.bot.Handle(&btnMenu, s.handleStart)
 
 	s.bot.Handle(&btnGrade, s.handleGrade)

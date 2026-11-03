@@ -9,18 +9,19 @@ const gradeButtonsPerRow = 3
 
 // Endpoints for callback handlers. Text is set per markup.
 var (
-	btnFlash = tele.Btn{Unique: "flash", Text: "⚡ Флеш"}
-	btnFail  = tele.Btn{Unique: "fail", Text: "✖ Не пролез"}
-	btnStat  = tele.Btn{Unique: "stat", Text: "📊 Статистика"}
-	btnMenu  = tele.Btn{Unique: "menu", Text: "← Назад"}
-	btnGrade = tele.Btn{Unique: "grade"}
+	btnFlash       = tele.Btn{Unique: "flash", Text: "⚡ Флеш"}
+	btnFail        = tele.Btn{Unique: "fail", Text: "✖ Не пролез"}
+	btnStat        = tele.Btn{Unique: "stat", Text: "📊 Статистика"}
+	btnLeaderboard = tele.Btn{Unique: "leaderboard", Text: "🏆 Лидерборд"}
+	btnMenu        = tele.Btn{Unique: "menu", Text: "← Назад"}
+	btnGrade       = tele.Btn{Unique: "grade"}
 )
 
 func mainMenu() *tele.ReplyMarkup {
 	m := &tele.ReplyMarkup{}
 	m.Inline(
 		m.Row(btnFlash, btnFail),
-		m.Row(btnStat),
+		m.Row(btnStat, btnLeaderboard),
 	)
 	return m
 }

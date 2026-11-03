@@ -10,6 +10,7 @@ import (
 type ClimberRepository interface {
 	Save(ctx context.Context, climber *domain.Climber) error
 	GetByTelegramID(ctx context.Context, telegramID int64) (*domain.Climber, error)
+	ListTopByRating(ctx context.Context, limit int) ([]*domain.Climber, error)
 }
 
 type AscentRepository interface {

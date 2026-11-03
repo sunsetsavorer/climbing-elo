@@ -6,4 +6,5 @@ var (
 	ErrBotRequired                = errors.New("bot required")
 	ErrGetOrCreateClimberRequired = errors.New("get or create climber use case required")
 	ErrRecordAscentRequired       = errors.New("record ascent use case required")
+	ErrGetLeaderboardRequired     = errors.New("get leaderboard use case required")
 )

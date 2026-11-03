@@ -13,3 +13,7 @@ type GetOrCreateClimberUseCase interface {
 type RecordAscentUseCase interface {
 	Exec(ctx context.Context, in usecase.RecordAscentInput) (*usecase.RecordAscentOutput, error)
 }
+
+type GetLeaderboardUseCase interface {
+	Exec(ctx context.Context, in usecase.GetLeaderboardInput) (*usecase.GetLeaderboardOutput, error)
+}

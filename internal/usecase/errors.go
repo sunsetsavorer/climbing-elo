@@ -8,4 +8,6 @@ var (
 	ErrClimberRepositoryRequired = errors.New("climber repository required")
 	ErrAscentRepositoryRequired  = errors.New("ascent repository required")
 	ErrTxManagerRequired         = errors.New("tx manager required")
+
+	ErrInvalidLimit = errors.New("limit must be positive")
 )

@@ -37,3 +37,26 @@ func (r *ClimberRepository) GetByTelegramID(ctx context.Context, telegramID int6
 	}
 	return fromClimberModel(&m), nil
 }
+
+// ListTopByRating returns climbers by rating descending; on a tie the one
+// who registered earlier ranks higher.
+func (r *ClimberRepository) ListTopByRating(ctx context.Context, limit int) ([]*domain.Climber, error) {
+	var ms []models.Climber
+
+	err := conn(ctx, r.db).
+		Order("rating DESC").
+		Order("created_at ASC").
+		Limit(limit).
+		Find(&ms).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	climbers := make([]*domain.Climber, len(ms))
+	for i := range ms {
+		climbers[i] = fromClimberModel(&ms[i])
+	}
+	return climbers, nil
+}
