@@ -3,45 +3,75 @@ package telegram
 import (
 	"errors"
 	"fmt"
+	"html"
 	"strings"
 
 	"github.com/sunsetsavorer/climbing-elo/internal/domain"
 	"github.com/sunsetsavorer/climbing-elo/internal/usecase"
 )
 
+// All responses are sent with HTML parse mode: escape user-provided text.
+
 func formatStartResponse(out *usecase.GetOrCreateClimberOutput) string {
-	greeting := "С возвращением"
+	greeting := "👋 <b>С возвращением"
 	if out.Created {
-		greeting = "Привет"
+		greeting = "👋 <b>Привет"
 	}
-	return fmt.Sprintf("%s, @%s!\n\n%s", greeting, out.Climber.Nickname, formatProfile(out.Climber))
+	if out.Climber.Nickname != "" {
+		greeting += ", @" + html.EscapeString(out.Climber.Nickname)
+	}
+	greeting += "!</b>"
+
+	if out.Created {
+		greeting += "\n\nЗаписывай пролазы, а я посчитаю твой рейтинг."
+	}
+	return greeting + "\n\n" + formatProfile(out.Climber)
 }
 
 func formatAscentResponse(out *usecase.RecordAscentOutput) string {
+	a := out.Ascent
+
+	title := fmt.Sprintf("⚡ <b>Флеш %s записан!</b>", a.Grade)
+	if a.Outcome == domain.OutcomeFail {
+		title = fmt.Sprintf("✖ <b>Попытка %s записана</b>", a.Grade)
+	}
+
+	trend := "📈"
+	if a.Delta < 0 {
+		trend = "📉"
+	}
+
 	return fmt.Sprintf(
-		"Пролаз записан!\n\nКатегория:  %s\nИзменение:  %s\nРейтинг:    %d",
-		out.Ascent.Grade,
-		formatDelta(out.Ascent.Delta),
-		out.Ascent.RatingAfter,
+		"%s\n\n%s Рейтинг: %d → <b>%d</b> (%s)",
+		title,
+		trend,
+		a.RatingAfter-a.Delta,
+		a.RatingAfter,
+		formatDelta(a.Delta),
 	)
 }
 
-func formatAscentNoGradeResponse(outcome domain.Outcome) string {
-	return fmt.Sprintf("Укажи категорию. Например: /%s 6B", string(outcome))
+func formatGradePromptResponse(outcome domain.Outcome) string {
+	title := "⚡ <b>Флеш</b>"
+	if outcome == domain.OutcomeFail {
+		title = "✖ <b>Не пролез</b>"
+	}
+	return title + "\n\nВыбери категорию:"
 }
 
 func formatHelpResponse() string {
-	return "Команды:\n\n" +
-		"/start — регистрация и профиль\n" +
-		"/flash {категория} — флеш\n" +
-		"/fail {категория} — не пролез\n" +
-		"/stat — твой рейтинг\n" +
-		"/help — список команд\n\n" +
-		"Категории: " + formatGrades()
-}
-
-func formatStatResponse(out *usecase.GetOrCreateClimberOutput) string {
-	return formatProfile(out.Climber)
+	var b strings.Builder
+	b.WriteString("📖 <b>Как пользоваться</b>\n\n")
+	b.WriteString("Жми кнопки под сообщением или пиши команды:\n\n")
+	for _, cmd := range commands {
+		b.WriteString("/" + cmd.name)
+		if cmd.args != "" {
+			b.WriteString(" <i>" + cmd.args + "</i>")
+		}
+		b.WriteString(" — " + strings.ToLower(cmd.description) + "\n")
+	}
+	b.WriteString("\n<b>Категории:</b>\n" + formatGrades())
+	return b.String()
 }
 
 func formatProfile(climber *domain.Climber) string {
@@ -50,7 +80,7 @@ func formatProfile(climber *domain.Climber) string {
 		hardestGrade = string(*climber.HardestGrade)
 	}
 	return fmt.Sprintf(
-		"Рейтинг:       %d\nПролазов:      %d\nСложнейший грейд:   %s",
+		"🏆 Рейтинг: <b>%d</b>\n🧗 Пролазов: <b>%d</b>\n💪 Сложнейший грейд: <b>%s</b>",
 		climber.Rating,
 		climber.AscentsCount,
 		hardestGrade,
@@ -67,13 +97,13 @@ func formatDelta(delta int) string {
 func formatError(err error) string {
 	switch {
 	case errors.Is(err, domain.ErrUnknownGrade):
-		return fmt.Sprintf("Неизвестная категория.\nДоступные: %s", formatGrades())
+		return "⚠️ <b>Неизвестная категория</b>\n\nДоступные:\n" + formatGrades()
 	case errors.Is(err, domain.ErrUnknownOutcome):
-		return "Неизвестный результат. Используй /flash или /fail."
+		return "⚠️ <b>Неизвестный результат</b>\n\nИспользуй /flash или /fail."
 	case errors.Is(err, domain.ErrClimberNotFound):
-		return "Скалолаз не найден. Начни с команды /start."
+		return "⚠️ <b>Скалолаз не найден</b>\n\nНачни с команды /start."
 	default:
-		return "Что-то пошло не так. Попробуй ещё раз."
+		return "⚠️ <b>Что-то пошло не так</b>\n\nПопробуй ещё раз."
 	}
 }
 
@@ -81,7 +111,7 @@ func formatGrades() string {
 	grades := domain.AllGrades()
 	names := make([]string, len(grades))
 	for i, g := range grades {
-		names[i] = string(g)
+		names[i] = "<code>" + string(g) + "</code>"
 	}
-	return strings.Join(names, ", ")
+	return strings.Join(names, " ")
 }
